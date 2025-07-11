@@ -1,0 +1,380 @@
+{%- liquid
+  assign video_url = section.settings.video_url
+  assign fallback_image = section.settings.fallback_image
+  assign sub_heading = section.settings.sub_heading
+  assign heading = section.settings.heading
+  assign description = section.settings.description
+  assign text_position = section.settings.text_position
+  assign button_label = section.settings.button_label
+  assign button_link = section.settings.button_link
+  assign overlay_opacity = section.settings.overlay_opacity
+  assign color_scheme = section.settings.color_scheme
+-%}
+
+<div class="video-banner color-{{ color_scheme }} gradient{% if fallback_image != nil %} video-banner--has-fallback{% endif %}">
+  <div class="video-banner__container">
+    {%- if video_url != blank -%}
+      <video class="video-banner__video" autoplay loop muted playsinline>
+        <source src="{{ video_url }}" type="video/mp4">
+      </video>
+    {%- endif -%}
+
+    {%- if fallback_image != blank -%}
+      <div class="video-banner__fallback">
+        {{
+          fallback_image
+          | image_url: width: 3840
+          | image_tag:
+            loading: 'lazy',
+            widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840',
+            class: 'video-banner__image'
+        }}
+      </div>
+    {%- endif -%}
+
+    <div class="video-banner__overlay" style="opacity: {{ overlay_opacity | divided_by: 100.0 }};"></div>
+
+    <div class="video-banner__content page-width content-container content-container--{{ text_position }}">
+      <div class="video-banner__text">
+        {%- if sub_heading != blank -%}
+          <h2 class="video-banner__sub_heading {{ section.settings.sub_heading_size }}">{{ sub_heading | escape }}</h2>
+        {%- endif -%}
+        {%- if heading != blank -%}
+          <h2 class="video-banner__heading {{ section.settings.heading_size }}">{{ heading | escape }}</h2>
+        {%- endif -%}
+        {%- if description != blank -%}
+          <div class="video-banner__description rte">{{ description }}</div>
+        {%- endif -%}
+        {%- if button_label != blank -%}
+          <a href="{{ button_link }}" class="button video-banner__button">{{ button_label | escape }}</a>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- if video_url != blank -%}
+      <button type="button" class="video-banner__control" aria-label="{{ 'sections.video-banner.play_pause' | t }}">
+        <span class="video-banner__play-icon">{% render 'icon-play' %}</span>
+        <span class="video-banner__pause-icon">{% render 'icon-pause' %}</span>
+      </button>
+    {%- endif -%}
+  </div>
+</div>
+
+<style>
+  .video-banner {
+    position: relative;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    overflow: hidden;
+  }
+
+  .video-banner__container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .video-banner__video,
+  .video-banner__fallback {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .video-banner__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    z-index: 1;
+  }
+
+  .video-banner__content {
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    z-index: 2;
+    padding: 2rem;
+  }
+
+  .video-banner__text {
+    max-width: 60rem;
+  }
+
+  .video-banner__sub_heading {
+    color: rgb(var(--color-background));
+  }
+
+  .video-banner__heading {
+    color: rgb(var(--color-background));
+    margin-bottom: 1.5rem;
+  }
+
+  .video-banner__description {
+    color: rgba(var(--color-background), 0.8);
+    margin-bottom: 2.5rem;
+  }
+
+  .video-banner__button {
+    margin-top: 1rem;
+    background: transparent;
+    border: 2px solid white;
+  }
+
+  .video-banner__pause-icon {
+    display: none;
+  }
+
+  .video-banner.is-paused .video-banner__play-icon {
+    display: none;
+  }
+
+  .video-banner.is-paused .video-banner__pause-icon {
+    display: block;
+  }
+
+  .content-container--left {
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .content-container--center {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .content-container--right {
+    justify-content: flex-end;
+    text-align: right;
+  }
+
+  @media screen and (max-width: 749px) {
+    .video-banner {
+      padding-top: 100%; /* Square aspect ratio for mobile */
+    }
+
+    .video-banner__content {
+      padding: 1.5rem;
+    }
+
+    .video-banner__heading {
+      font-size: calc(var(--font-heading-scale) * 2rem);
+      margin-bottom: 1rem;
+    }
+
+    .video-banner__description {
+      margin-bottom: 1.5rem;
+    }
+
+    .video-banner__text {
+      max-width: 100%;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const videoBanners = document.querySelectorAll('.video-banner');
+
+    videoBanners.forEach(banner => {
+      const video = banner.querySelector('.video-banner__video');
+
+      if (!video || !control) return;
+
+      control.addEventListener('click', function() {
+        if (video.paused) {
+          video.play();
+          banner.classList.remove('is-paused');
+        } else {
+          video.pause();
+          banner.classList.add('is-paused');
+        }
+      });
+
+      // Handle autoplay with sound policies
+      video.muted = true;
+      const playPromise = video.play();
+
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          // Autoplay was prevented, show fallback
+          if (banner.querySelector('.video-banner__fallback')) {
+            video.style.display = 'none';
+          }
+        });
+      }
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Video Banner",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Video"
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "Video URL",
+      "info": "Upload MP4 video to Shopify Files and paste URL here"
+    },
+    {
+      "type": "image_picker",
+      "id": "fallback_image",
+      "label": "Fallback image",
+      "info": "Displayed when video cannot autoplay"
+    },
+    {
+      "type": "text",
+      "id": "sub_heading",
+      "default": "Video banner",
+      "label": "Sub-Heading"
+    },
+     {
+      "type": "select",
+      "id": "sub_heading_size",
+      "options": [
+        {
+          "value": "h3",
+          "label": "Small"
+        },
+        {
+          "value": "h2",
+          "label": "Medium"
+        },
+        {
+          "value": "h1",
+          "label": "Large"
+        }
+      ],
+      "default": "h3",
+      "label": "Sub_Heading size"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "default": "Video banner",
+      "label": "Heading"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Small"
+        },
+        {
+          "value": "h1",
+          "label": "Medium"
+        },
+        {
+          "value": "h0",
+          "label": "Large"
+        }
+      ],
+      "default": "h1",
+      "label": "Heading size"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "select",
+      "id": "text_position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center",
+      "label": "Content position"
+    },
+    {
+      "type": "header",
+      "content": "Overlay"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Overlay opacity",
+      "default": 30
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "options": [
+        {
+          "value": "accent-1",
+          "label": "Accent 1"
+        },
+        {
+          "value": "accent-2",
+          "label": "Accent 2"
+        },
+        {
+          "value": "background-1",
+          "label": "Background 1"
+        },
+        {
+          "value": "background-2",
+          "label": "Background 2"
+        },
+        {
+          "value": "inverse",
+          "label": "Inverse"
+        }
+      ],
+      "default": "background-1",
+      "label": "Color scheme",
+      "info": "Affects text color"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Video Banner"
+    }
+  ]
+}
+{% endschema %}

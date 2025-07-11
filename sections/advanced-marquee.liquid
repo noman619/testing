@@ -1,0 +1,114 @@
+{% schema %}
+{
+  "name": "Verano-Style Marquee",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "marquee_text",
+      "label": "Statements (comma-separated)",
+      "default": "Free Shipping,24/7 Support,100% Satisfaction Guarantee"
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Scroll Direction",
+      "options":[
+        {"value":"left","label":"Left to Right"},
+        {"value":"right","label":"Right to Left"}
+      ],
+      "default":"left"
+    },
+    {
+      "type":"select",
+      "id":"speed",
+      "label":"Scroll Speed",
+      "options":[
+        {"value":"slow","label":"Slow"},
+        {"value":"normal","label":"Normal"},
+        {"value":"fast","label":"Fast"}
+      ],
+      "default":"normal"
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause on Hover",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "Font Size (px)",
+      "min": 12,
+      "max": 32,
+      "default": 16
+    }
+  ],
+  "presets":[{"name":"Verano Marquee"}]
+}
+{% endschema %}
+
+<style>
+  .marquee-wrap {
+    overflow: hidden;
+    width: 100%;
+    padding: 10px 0;
+    background-color: {{ section.settings.background_color }};
+  }
+  .marquee-track {
+    display: flex;
+    white-space: nowrap;
+    animation: scroll-marquee var(--marq-duration) linear infinite;
+  }
+  .marquee-track span {
+    display: inline-block;
+    padding: 3em 2em;
+    font-weight: 400;
+    font-size: {{ section.settings.font_size }}px;
+    color: {{ section.settings.text_color }};
+  }
+
+  .marq-speed-slow { --marq-duration: 30s; }
+  .marq-speed-normal { --marq-duration: 20s; }
+  .marq-speed-fast { --marq-duration: 10s; }
+
+  {% if section.settings.pause_on_hover %}
+  .marquee-wrap:hover .marquee-track {
+    animation-play-state: paused;
+  }
+  {% endif %}
+
+  @keyframes scroll-marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+</style>
+
+<div class="marquee-wrap marq-speed-{{ section.settings.speed }}">
+  <div class="marquee-track {% if section.settings.direction == 'right' %}reverse{% endif %}">
+    {% assign items = section.settings.marquee_text | split: ',' %}
+    {% for i in (1..2) %}
+      {% for it in items %}
+        <span>{{ it | strip }}</span>
+      {% endfor %}
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+  .reverse {
+    animation-direction: reverse;
+  }
+</style>

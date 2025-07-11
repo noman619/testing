@@ -1,0 +1,145 @@
+{% schema %}
+{
+  "name": "Footer Custom",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Footer Custom"
+    }
+  ]
+}
+{% endschema %}
+
+<footer class="footer-custom">
+  <div class="footer-grid container">
+    <div class="footer-block">
+      <h4>24/7 Customer Support</h4>
+      <p>Email: <a href="mailto:support@veranohill.com">support@veranohill.com</a></p>
+      <p>Tel: 1 (888) 308-6351</p>
+    </div>
+    <div class="footer-block">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="/policies/privacy-policy">Privacy Policy</a></li>
+        <li><a href="/policies/terms-of-service">Terms of Service</a></li>
+      </ul>
+    </div>
+    <div class="footer-block">
+      <h4>Help Center</h4>
+      <ul>
+        <li><a href="/pages/contact">Contact Us</a></li>
+        <li><a href="/pages/warranty">Warranty</a></li>
+        <li><a href="/policies/refund-policy">Returns/Cancellation Policy</a></li>
+      </ul>
+    </div>
+    <div class="footer-block">
+      <h4>Newsletter</h4>
+      <p>Sign up to our newsletter to receive exclusive offers.</p>
+      <form method="post" action="{{ routes.newsletter_subscribe_url }}">
+        <input type="hidden" name="form_type" value="customer">
+        <input type="email" name="contact[email]" placeholder="E-mail" required>
+        <button type="submit">SUBSCRIBE</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="footer-bottom container">
+    <div class="social-icons">
+      <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+      <a href="#"><i class="fa-brands fa-instagram"></i></a>
+      <a href="#"><i class="fa-brands fa-pinterest-p"></i></a>
+      <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+    </div>
+
+    <div class="copyright">&copy; {{ 'now' | date: '%Y' }} - Verano Hill</div>
+
+    <div class="payment-icons">
+      {{ payment_methods }}
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer-custom {
+    background-color: #fafafa;
+    padding: 60px 60px 20px 60px;
+    font-family: 'Helvetica Neue', sans-serif;
+    color: #111;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 30px;
+    margin-bottom: 30px;
+  }
+
+  .footer-block h4 {
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
+
+  .footer-block p, .footer-block a {
+    color: #555;
+    font-size: 14px;
+    text-decoration: none;
+  }
+
+  .footer-block ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .footer-block ul li {
+    margin: 5px 0;
+  }
+
+  .footer-block input[type="email"] {
+    padding: 8px;
+    width: 100%;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+  }
+
+  .footer-block button {
+    background: #000;
+    color: #fff;
+    padding: 10px;
+    margin-top: 10px;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    gap: 15px;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+  }
+
+  .social-icons a {
+    margin-right: 10px;
+    color: #000;
+    font-size: 16px;
+  }
+
+  .payment-icons {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 768px) {
+    .footer-bottom {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+    }
+  }
+</style>
